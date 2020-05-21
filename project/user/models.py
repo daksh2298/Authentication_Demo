@@ -13,7 +13,7 @@ class User(db.Document, UserMixin):
     password = db.StringField(max_length=255)
     auth_token = db.StringField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         op = '{{' \
              'name: {}, ' \
              'email: {}, ' \
@@ -25,23 +25,46 @@ class User(db.Document, UserMixin):
 
         return op
 
-    def hash_password(self, password):
+    def hash_password(self, password: str) -> None:
+        """
+        Hash the password entered by the user during sign up.
+        :param password: password received in request to encrypt
+        :type password: str
+        """
         self.password = sha256_crypt.hash(password)
 
-    def verify_password(self, password):
+    def verify_password(self, password: str) -> bool:
+        """
+        Verified the password entered by the user.
+        :rtype: bool
+        :param password: password received in request to verify
+        :type password: str
+        :return: True if password is verified
+        """
         return sha256_crypt.verify(password, self.password)
 
-    def set_auth_token(self):
+    def set_auth_token(self) -> None:
+        """
+        Sets authentication token for first login.
+        """
         s = Serializer(app.config['SECRET_KEY'], expires_in=10000000)
         self.auth_token = s.dumps({'username': self.username}).decode('utf-8')
 
-    def set_new_auth_token(self):
+    def set_new_auth_token(self) -> None:
+        """
+        Sets new authentication token once user sign out.
+        """
         s = Serializer(app.config['SECRET_KEY'], expires_in=10000000)
         self.auth_token = s.dumps({'username': self.username}).decode('utf-8')
         self.save()
 
     @staticmethod
-    def verify_auth_token(token):
+    def verify_auth_token(token: str) -> object:
+        """
+        :param token: the token received in the authorization
+        :return: User object if token is valid, else None
+        :rtype: User
+        """
         s = Serializer(app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
@@ -55,7 +78,14 @@ class User(db.Document, UserMixin):
         else:
             return None
 
-    def create_user(self, name, username, password):
+    def create_user(self, name: str, username: str, password: str) -> bool:
+        """
+        :param name: The name received in the request
+        :param username: The username received in the request
+        :param password: The password received in the request
+        :return: True if the user is created else False
+        :rtype: bool
+        """
         try:
             self.name = name
             self.username = username
@@ -66,4 +96,4 @@ class User(db.Document, UserMixin):
             return True
         except Exception as e:
             msg = e.message
-            return msg
+            return False

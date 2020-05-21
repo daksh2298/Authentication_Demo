@@ -4,9 +4,9 @@ from flask import *
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
 from flask_mongoengine import MongoEngine
-from utils import *
 import os
 from dotenv import load_dotenv
+from utils import unauthorized_access
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
