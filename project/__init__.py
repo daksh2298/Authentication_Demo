@@ -1,6 +1,6 @@
 __author__ = 'Daksh Patel'
 
-from flask import *
+from flask import Flask
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
 from flask_mongoengine import MongoEngine
@@ -12,6 +12,7 @@ app = Flask(__name__)
 app.secret_key = 'secret-key'
 CORS(app)
 auth = HTTPBasicAuth()
+
 
 
 @auth.error_handler
